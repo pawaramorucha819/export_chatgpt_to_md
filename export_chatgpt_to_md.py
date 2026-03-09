@@ -68,7 +68,8 @@ def render_conv_to_md(conv: dict) -> str:
 
     lines = []
     lines.append("---")
-    lines.append(f'title: "{title.replace(chr(34), r"\"")}"')
+    escaped_title = title.replace(chr(34), r"\"")
+    lines.append(f'title: "{escaped_title}"')
     if cid:
         lines.append(f'chatgpt_conversation_id: "{cid}"')
     if created:
@@ -113,7 +114,7 @@ def main():
     ap.add_argument("--mode", choices=["per_chat", "per_month"], default="per_month",
                     help="per_chat: one md per conversation; per_month: bundle by YYYY-MM (recommended for NotebookLM)")
     args = ap.parse_args()
-
+    
     convs = load_conversations(args.conversations_json)
     os.makedirs(args.out, exist_ok=True)
 
@@ -127,7 +128,7 @@ def main():
             path = os.path.join(args.out, fn)
             with open(path, "w", encoding="utf-8") as f:
                 f.write(render_conv_to_md(conv))
-        print(f"Done. Wrote per-chat markdowns to: {args.out}")
+        print(f"Done. Wrote per-chat markdowns to: {args.out}", flush=True)
 
     else:  # per_month
         buckets = defaultdict(list)
